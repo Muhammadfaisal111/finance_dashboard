@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function TransactionForm({ addTransaction }) {
+export default function TransactionForm({
+  addTransaction,
+  editingTransaction,
+  updateTransaction,
+}) {
   const [form, setForm] = useState({
     description: "",
     amount: "",
     category: "",
     date: "",
   });
+
+  // If editing, fill the form with existing values
+  useEffect(() => {
+    if (editingTransaction !== null) {
+      setForm(editingTransaction);
+    }
+  }, [editingTransaction]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,7 +28,11 @@ export default function TransactionForm({ addTransaction }) {
     if (!form.description || !form.amount || !form.category || !form.date)
       return;
 
-    addTransaction(form);
+    if (editingTransaction) {
+      updateTransaction(form);
+    } else {
+      addTransaction(form);
+    }
     setForm({ description: "", amount: "", category: "", date: "" });
   };
 
@@ -57,8 +72,9 @@ export default function TransactionForm({ addTransaction }) {
         onChange={handleChange}
         className="w-full p-2 border rounded"
       />
+
       <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
-        Add Transaction
+        {editingTransaction ? "Update Transaction" : "Add Transaction"}
       </button>
     </form>
   );
